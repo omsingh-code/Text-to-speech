@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hinglish Text To Speech</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background: linear-gradient(135deg,#111,#1f1f1f);
+      color:white;
+    }
+
+    .container{
+      width:90%;
+      max-width:600px;
+      background:#222;
+      padding:25px;
+      border-radius:20px;
+      box-shadow:0 0 20px rgba(0,0,0,0.5);
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:20px;
+      font-size:30px;
+    }
+
+    textarea{
+      width:100%;
+      height:180px;
+      resize:none;
+      border:none;
+      outline:none;
+      padding:15px;
+      border-radius:15px;
+      font-size:18px;
+      background:#333;
+      color:white;
+      margin-bottom:20px;
+    }
+
+    select{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      margin-bottom:20px;
+      font-size:16px;
+      background:#333;
+      color:white;
+    }
+
+    .buttons{
+      display:flex;
+      gap:10px;
+    }
+
+    button{
+      flex:1;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      font-size:18px;
+      cursor:pointer;
+      transition:0.3s;
+      font-weight:bold;
+    }
+
+    .speak{
+      background:#00c853;
+      color:white;
+    }
+
+    .stop{
+      background:#ff1744;
+      color:white;
+    }
+
+    button:hover{
+      transform:scale(1.03);
+      opacity:0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>🗣 Hinglish Text To Speech</h1>
+
+    <textarea id="text">
+Hello bhai, kaise ho? Aaj mausam kaafi acha hai.
+    </textarea>
+
+    <select id="voiceSelect"></select>
+
+    <div class="buttons">
+      <button class="speak" onclick="speakText()">Speak</button>
+      <button class="stop" onclick="stopSpeech()">Stop</button>
+    </div>
+  </div>
+
+  <script>
+    const text = document.getElementById("text");
+    const voiceSelect = document.getElementById("voiceSelect");
+
+    let voices = [];
+
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+
+      voiceSelect.innerHTML = "";
+
+      voices.forEach((voice, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})`;
+
+        // Hindi / English voices ko upar dikhane ke liye
+        if (
+          voice.lang.includes("hi") ||
+          voice.lang.includes("en")
+        ) {
+          option.selected = true;
+        }
+
+        voiceSelect.appendChild(option);
+      });
+    }
+
+    loadVoices();
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakText() {
+
+      speechSynthesis.cancel();
+
+      const speech = new SpeechSynthesisUtterance();
+
+      speech.text = text.value;
+
+      speech.voice = voices[voiceSelect.value];
+
+      // Speed
+      speech.rate = 1;
+
+      // Pitch
+      speech.pitch = 1;
+
+      // Volume
+      speech.volume = 1;
+
+      // Hinglish ke liye English best rehta hai
+      speech.lang = "en-IN";
+
+      speechSynthesis.speak(speech);
+    }
+
+    function stopSpeech() {
+      speechSynthesis.cancel();
+    }
+  </script>
+
+</body>
+</html>
